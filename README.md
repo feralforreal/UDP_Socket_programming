@@ -13,17 +13,11 @@ $ ./server 5001 # Running your server with port number 5001
 And then it waits for a UDP connection after binding to port 5001
 And accordingly client could send get, put, delete, ls, exit [file_name]”
 
-A brief explanation of some of the functions used in the code is provided here. However, for in depth understanding of the functions, please read the manpages of the functions.
-o socket() : The input parameters of the function lets you determine which type of socket you want in your application. It may be a TCP or UDP socket. The function returns a socket descriptor which can prove helpful later system calls or -1 on error. A quick look at the function:
+Asome of the functions used in the code are -
 o sockfd = socket(PF_INET,SOCK_DGRAM,0); o sockfd is a UDP socket.
- o bind() : Once we have our socket ready, we have to associate it with a port number on the local machine. It will return -1 on error. When calling bind function, it should be noted that ports below 1024 are reserved. Any port number above 1024 and less than 65535 can be used. A quick reference:
-o bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
-o sendto(): This function is used to send the data. Since it is used in connectionless datagrams, the input parameter of this function includes the destination address. It returns the number of bytes sent on success and -1 on error.
- o ssize_t sendto( int sockfd, void *buff, size_t nbytes, int flags, const struct sockaddr* to, socklen_t addrlen);
-o “buff” is the address of the data (nbytes long).
-o “to” is the address of a sockaddr containing the destination address.
-o recvfrom() : This function is used to receive the data from an unconnected datagram socket. The input paramters contain the address of the originating machine. It returns the number of bytes received on success and -1 on error
- o ssize_t recvfrom( int sockfd, void *buff, size_t nbytes, int flags, struct sockaddr* from, socklen_t *fromaddrlen);
+bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
+ssize_t sendto( int sockfd, void *buff, size_t nbytes, int flags, const struct sockaddr* to, socklen_t addrlen);
+ssize_t recvfrom( int sockfd, void *buff, size_t nbytes, int flags, struct sockaddr* from, socklen_t *fromaddrlen);
  
 
 
@@ -49,74 +43,9 @@ incoming datagrams or wait a specified amount of time until another event (like 
 occur. Both are designed using an "event driven" model hinging around non-blocking sockets and poll(2); the server
 is designed to be able to support many simultaneous clients.
 
-===============
-Protocol Design
-===============
-
-The following describes how the protocol messages are laid out in a byte-wise fashion. All values are assumed to be
-in network byte order (big endian). Messages have the following structure:
-
-* Byte 0: The protocol magic value 0xF1. This is used as quick check to determine if a datagram is a valid message or
-          not.
-* Byte 1: A flags field. The following are valid flags:
-       * 0x1 (MYFTP_F_MOREDATA): There are further messages coming with additional data for a "list", "get" or "put"
-                                 connection.
-       * 0x2 (MYFTP_F_RETRY): This is not the first time the remote has sent this message.
-       * 0x4 (MYFTP_F_FINAL): This is the final message the remote is sending, and the remote expects no further
-                              responses.
-* Bytes 2-3: A 16-bit opcode:
-       *  1 (MYFTP_OP_COMMAND): A command message sent from a client.
-       *  2 (MYFTP_OP_START): A start message sent from a server.
-       *  3 (MYFTP_OP_OK): An OK acknowledgement from either the client or server.
-       *  4 (MYFTP_OP_ERROR): An error message from either the client or server.
-       *  5 (MYFTP_OP_DATA): A data message from either the client or server during a "get" or "put" (where appropriate)
-       *  6 (MYFTP_OP_LIST): A list data message from the server to the client for an "ls" command.
-       *  7 (MYFTP_OP_FIN): A fin message, sent by both ends at the end of a connection.
-* Bytes 4-5: The 16-bit unsigned connection ID.
-* Bytes 6-9: The 32-bit unsigned sequence number.
-
-The remainder of the message is opcode dependent.
-For MYFTP_OP_COMMAND:
-   * bytes 10-13: A 32-bit unsigned number of milliseconds for the requested max timeout window.
-   * bytes 14-15: The 16-bit unsigned length of the command string (denoted as N).
-   * bytes 16-(16+N): The command string (where N is determined by the preceeding value).
-   * bytes (16+N+1)-(16+N+3): The 16-bit unsigned length of the arg string (denoted as M).
-   * bytes (16+N+4)-(16+N+M+4): The argument string.
-
-For MYFTP_OP_START:
-   * bytes 10-13: The 32-bit unsigned sequence number this message is in response to.
-   * bytes 14-17: The 32-bit unsigned value for the server's final adjusted maximum timeout window,
-                  which will be used by both the client and server.
-
-For MYFTP_OP_OK:
-   * bytes 10-13: The 32-bit unsigned sequence number this message is in response to.
-
-For MyFTP_OP_ERROR:
-   * bytes 10-13: The 32-bit unsigned sequence number this message is in response to.
-   * bytes 14-15: The 16-bit unsigned error code generated at the remote.
-   * bytes 16-17: The 16-bit unsigned length of the error message (denoted as N).
-   * bytes 18-(18+N): The error message string.
-
-For MYFTP_OP_DATA:
-   * bytes 10-13: The 32-bit unsigned block number for the current data message.
-   * bytes 14-17: The 32-bit unsigned (approximate) number of total blocks.
-   * bytes 18-19: The 16-bit unsigned length of the data block (denoted as N).
-   * bytes 20-(20+N): The block data payload for this message.
-
-For MYFTP_OP_LIST:
-   * bytes 10-13: The 32-bit unsigned page number for the current list message.
-   * bytes 14-15: The 16-bit unsigned number of file names packed in this response.
-   * bytes 16-17: The 16-bit unsigned length length of the packed name string (denoted as N).
-   * bytes 18-(18+N): The file names packed as a array. Each filename is null terminated.
-
-For MYFTP_OP_FIN:
-   * bytes 10-13: The 32-bit unsigned sequence number this message is in response to.
-   * bytes 14-15: The 16-bit unsigned connection ID for the remote connection this is in response to.
-
-
-======================
-How I Have Tested This
-======================
+-----------------------
+Testing
+------------------------
 
 I have written a few libcheck tests (under test) to check some of the primitive functions I have written in the
 "common" directory. Additionally, the programs are built with essentially all of the GCC warning flags turned on
@@ -140,9 +69,9 @@ tested to reliably transfer files correctly even with the following significant 
 
 including all of the above at the same time.
 
-====================
+-----------------------
 Building and Running
-====================
+-----------------------
 
 **NOTE**: I have only built and developed this against Debian Linux. The server and client may build and run on Mac
           OS X or a BSD. They WILL NOT BUILD on Windows (without something like cygwin or WSL) because Windows lacks
