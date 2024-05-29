@@ -6,18 +6,18 @@ Approach
 ---------
 
 The client:
-1. The client takes two command line arguments: an IP address of the machine on which the server application is running, and the port the server application is using. (The IP address can be obtained using hostname -i) For example:
+The client takes two command line arguments: an IP address of the machine on which the server application is running, and the port the server application is using. (The IP address can be obtained using hostname -i) For example:
 * $ gcc uftp_client.c -o client
 * $ ./client 192.168.1.101 5001
-The server:
 
-1. The server takes one command line argument: a port number for the server to use. example:
+The server:
+The server takes one command line argument: a port number for the server to use. example:
 * $ gcc uftp_server.c -o server # Compile your c-program
 * $ ./server 5001 # Running your server with port number 5001
 And then it waits for a UDP connection after binding to port 5001
 And accordingly client could send get, put, delete, ls, exit [file_name]”
 
-Asome of the functions used in the code are -
+And some of the functions used in the code are -
 * o sockfd = socket(PF_INET,SOCK_DGRAM,0); o sockfd is a UDP socket.
 * bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
 * ssize_t sendto( int sockfd, void *buff, size_t nbytes, int flags, const struct sockaddr* to, socklen_t addrlen);
