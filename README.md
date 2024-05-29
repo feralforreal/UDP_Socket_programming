@@ -1,15 +1,19 @@
 # UDP_Socket_programming
 UDP (Use Datagram Protocol) is a connectionless transmission model with a minimum of protocol mechanism. It has no handshaking dialogues and no mechanism of acknowledgements (ACKs). Therefore, every packet delivered by using UDP protocol is not guaranteed to be received, but UDP avoids unnecessary delay, thanks to its simplicity.
 
-Approach 
+--------
+Approach
+---------
+
 The client:
 1. The client takes two command line arguments: an IP address of the machine on which the server application is running, and the port the server application is using. (The IP address can be obtained using hostname -i) For example:
-$ gcc uftp_client.c -o client
-$ ./client 192.168.1.101 5001
+* $ gcc uftp_client.c -o client
+* $ ./client 192.168.1.101 5001
 The server:
+
 1. The server takes one command line argument: a port number for the server to use. example:
-$ gcc uftp_server.c -o server # Compile your c-program
-$ ./server 5001 # Running your server with port number 5001
+* $ gcc uftp_server.c -o server # Compile your c-program
+* $ ./server 5001 # Running your server with port number 5001
 And then it waits for a UDP connection after binding to port 5001
 And accordingly client could send get, put, delete, ls, exit [file_name]”
 
