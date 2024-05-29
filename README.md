@@ -14,10 +14,10 @@ And then it waits for a UDP connection after binding to port 5001
 And accordingly client could send get, put, delete, ls, exit [file_name]”
 
 Asome of the functions used in the code are -
-o sockfd = socket(PF_INET,SOCK_DGRAM,0); o sockfd is a UDP socket.
-bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
-ssize_t sendto( int sockfd, void *buff, size_t nbytes, int flags, const struct sockaddr* to, socklen_t addrlen);
-ssize_t recvfrom( int sockfd, void *buff, size_t nbytes, int flags, struct sockaddr* from, socklen_t *fromaddrlen);
+* o sockfd = socket(PF_INET,SOCK_DGRAM,0); o sockfd is a UDP socket.
+* bind(sockfd, (struct sockaddr *)&my_addr, sizeof my_addr);
+* ssize_t sendto( int sockfd, void *buff, size_t nbytes, int flags, const struct sockaddr* to, socklen_t addrlen);
+* ssize_t recvfrom( int sockfd, void *buff, size_t nbytes, int flags, struct sockaddr* from, socklen_t *fromaddrlen);
  
 
 
